@@ -9,19 +9,51 @@
     <version>0.0.1</version>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
-        <java.version>16</java.version>
         <lombok.version>1.18.20</lombok.version>
         <jbannotations.version>20.1.0</jbannotations.version>
         <jackson.version>2.12.3</jackson.version>
-        <proguard.version>6.2.2</proguard.version>
-        <proguard.conf>${project.basedir}/proguard.conf</proguard.conf>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
+        <java.version>16</java.version>
     </properties>
 
     <build>
+        <sourceDirectory>target/generated-sources</sourceDirectory>
+        <testSourceDirectory>target/generated-test-sources</testSourceDirectory>
         <plugins>
+            <plugin>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-maven-plugin</artifactId>
+                <version>${lombok.version}.0</version>
+                <executions>
+                    <execution>
+                        <id>delombok</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>delombok</goal>
+                        </goals>
+                        <configuration>
+                            <addOutputDirectory>false</addOutputDirectory>
+                            <sourceDirectory>src/main/java</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-delombok</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>testDelombok</goal>
+                        </goals>
+                        <configuration>
+                            <addOutputDirectory>false</addOutputDirectory>
+                            <sourceDirectory>src/test/java</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-test-sources</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -69,6 +101,42 @@
                         </transformer>
                     </transformers>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <reportOutputDirectory>${project.basedir}/docs</reportOutputDirectory>
+                    <destDir>docs</destDir>
+                    <show>private</show>
+                    <detectJavaApiLink>true</detectJavaApiLink>
+                    <nohelp>true</nohelp>
+                    <links>
+                        <link>https://guava.dev/releases/snapshot-jre/api/docs/</link>
+<!--                        <link>https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.12.2/</link>-->
+<!--                        <link>https://fasterxml.github.io/jackson-dataformats-text/javadoc/yaml/2.12/</link>-->
+                        <link>https://javadoc.io/doc/org.jetbrains/annotations/20.1.0/</link>
+<!--                        <link>https://commons.apache.org/proper/commons-io/javadocs/api-2.5/</link>-->
+                    </links>
+                    <linksource>true</linksource>
+                    <notimestamp>true</notimestamp>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <docencoding>${project.build.sourceEncoding}</docencoding>
+                    <charset>${project.build.sourceEncoding}</charset>
+                    <source>16</source>
+                    <release>15</release>
+                    <additionalOptions>-Xdoclint:none</additionalOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javadoc</goal>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
